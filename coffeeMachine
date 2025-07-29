@@ -1,0 +1,151 @@
+const input = require('sync-input');
+
+const buyOption = "buy";
+const fillOption = "fill";
+const takeOption = "take";
+const smellOption = "smell";
+const remainingOption = "remaining";
+const exitOption = "exit";
+const backOption = "back";
+
+const espressoOption = 1;
+const espressoWater = 250;
+const espressoCoffeeBeans = 16;
+const espressoCost = 4;
+
+const latteOption = 2;
+const latteWater = 350;
+const latteMilk = 75;
+const latteCoffeeBeans = 20;
+const latteCost = 7;
+
+const cappuccinoOption = 3;
+const cappuccinoWater = 200;
+const cappuccinoMilk = 100;
+const cappuccinoCoffeeBeans = 12;
+const cappuccinoCost = 6;
+
+let waterAvailable = 400;
+let milkAvailable = 540;
+let coffeeBeansAvailable = 120;
+let disposableCupsAvailable = 9;
+let moneyAvailable = 550;
+
+let showRemaining = () => {
+    console.log();
+    console.log("The coffee machine has:");
+    console.log(`${waterAvailable} ml of water`);
+    console.log(`${milkAvailable} ml of milk`);
+    console.log(`${coffeeBeansAvailable} g of coffee beans`);
+    console.log(`${disposableCupsAvailable} disposable cups`);
+    console.log(`\$${moneyAvailable} of money`);
+    console.log();
+}
+
+let checkWater = (option) => {
+    if ((option === espressoOption && (waterAvailable - espressoWater) < 0)
+        || (option === latteOption && (waterAvailable - latteWater) < 0)
+        || (option === cappuccinoOption && (waterAvailable - cappuccinoWater) < 0)) {
+        console.log("Sorry, not enough water!");
+        return false;
+    }
+    return true;
+}
+
+let checkMilk = (option) => {
+    if ((option === latteOption && (milkAvailable - latteMilk) < 0)
+        || (option === cappuccinoOption && (milkAvailable - cappuccinoMilk) < 0)) {
+        console.log("Sorry, not enough milk!");
+        return false;
+    }
+    return true;
+}
+
+let checkCoffeeBeans = (option) => {
+    if ((option === espressoOption && (coffeeBeansAvailable - espressoCoffeeBeans) < 0)
+        || (option === latteOption && (coffeeBeansAvailable - latteCoffeeBeans) < 0)
+        || (option === cappuccinoOption && (coffeeBeansAvailable - cappuccinoCoffeeBeans) < 0)) {
+        console.log("Sorry, not enough coffee beans!");
+        return false;
+    }
+    return true;
+}
+
+let checkResources = (option) => {
+    if (!checkWater(option) || !checkMilk(option) || !checkCoffeeBeans(option)) {
+        return false;
+    }
+    console.log("I have enough resources, making you a coffee!");
+    return true;
+};
+
+let buyEspresso = (option) => {
+    if (!checkResources(option)) {
+        return;
+    }
+    waterAvailable -= espressoWater;
+    coffeeBeansAvailable -= espressoCoffeeBeans;
+    moneyAvailable += espressoCost;
+    disposableCupsAvailable -= 1;
+}
+
+let buyLatte = (option) => {
+    if (!checkResources(option)) {
+        return;
+    }
+    waterAvailable -= latteWater;
+    milkAvailable -= latteMilk;
+    coffeeBeansAvailable -= latteCoffeeBeans;
+    moneyAvailable += latteCost;
+    disposableCupsAvailable -= 1;
+}
+
+let buyCappuccino = (option) => {
+    if (!checkResources(option)) {
+        return;
+    }
+    waterAvailable -= cappuccinoWater;
+    milkAvailable -= cappuccinoMilk;
+    coffeeBeansAvailable -= cappuccinoCoffeeBeans;
+    moneyAvailable += cappuccinoCost;
+    disposableCupsAvailable -= 1;
+}
+
+let getMainAction = () => input(`Write action (${buyOption}, ${fillOption}, ${takeOption}, ${smellOption}, ${remainingOption}, exit): `);
+
+let exit = false;
+let action = getMainAction();
+while (!exit) {
+    if (action === buyOption) {
+        let option = input(`What do you want to buy? ${espressoOption} - espresso, ${latteOption} - latte, ${cappuccinoOption} - cappuccino, ${backOption} - to main menu: `);
+        if (option == backOption) {
+            action = getMainAction();
+            continue;
+        }
+        option = Number(option);
+
+        if (option === espressoOption) {
+            buyEspresso(option);
+        } else if (option === latteOption) {
+            buyLatte(option);
+        } else if (option === cappuccinoOption) {
+            buyCappuccino(option);
+        }
+    }
+    else if (action === fillOption) {
+        waterAvailable += Number(input("Write how many ml of water you want to add: "));
+        milkAvailable += Number(input("Write how many ml of milk you want to add: "));
+        coffeeBeansAvailable += Number(input("Write how many grams of coffee beans you want to add: "));
+        disposableCupsAvailable += Number(input("Write how many disposable cups you want to add: "));
+    } else if (action === takeOption) {
+        console.log(`I gave you \$${moneyAvailable}`);
+        moneyAvailable = 0;
+    } else if (action === smellOption) {
+        console.log("Smells are free enjoy!");
+    } else if (action === remainingOption) {
+        showRemaining();
+    } else if (action === exitOption) {
+        break;
+    }
+    action = getMainAction();
+}
